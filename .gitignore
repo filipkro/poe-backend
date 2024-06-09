@@ -50,7 +50,7 @@ slurm-*
 *.snm
 
 sls06-pngs/
-*.mp4
+#*.mp4
 
 # Distribution / packaging
 .Python
