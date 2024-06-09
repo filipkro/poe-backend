@@ -1,6 +1,6 @@
 import os
 import boto3
-from configparser import ConfigParser
+#from configparser import ConfigParser
 from botocore.exceptions import NoCredentialsError, ClientError
 from dateutil import tz
 from datetime import date
@@ -19,13 +19,13 @@ else:
 q = Queue(connection=r)
 
 BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-config = ConfigParser()
+#config = ConfigParser()
 
-config.read(os.path.join(BASE, 'configs/config'))
-ACCESS_KEY = config.get('aws', 'access')
-SECRET_KEY = config.get('aws', 'secret')
+#config.read(os.path.join(BASE, 'configs/config'))
+#ACCESS_KEY = config.get('aws', 'access')
+#SECRET_KEY = config.get('aws', 'secret')
 
-del config, ConfigParser
+#del config, ConfigParser
 
 
 def get_variable_from_req(request, key):
@@ -193,7 +193,7 @@ def download_from_aws(local_file, s3_file):
 def delete_from_aws(file):
     print("Delete Successful")
     return True
-    
+
 # def delete_from_aws(file):
 #     s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
 #                       aws_secret_access_key=SECRET_KEY)

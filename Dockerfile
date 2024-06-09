@@ -15,3 +15,7 @@ RUN python -c "import mmcv; print(mmcv.__file__)"
 ENV PYTHONUNBUFFERED 1
 
 COPY . /app
+
+RUN wget https://download.openxlab.org.cn/models/mmdetection/FasterR-CNN/weight/faster-rcnn_r50_fpn_1x_coco -O /app/pose/mmdet-files/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth
+
+RUN wget https://download.openmmlab.com/mmpose/top_down/hrnet/hrnet_w32_coco_wholebody_256x192_dark-469327ef_20200922.pth -O /app/pose/mmpose-files/hrnet_w32_coco_wholebody_256x192_dark-469327ef_20200922.pth

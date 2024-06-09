@@ -16,12 +16,13 @@ leg = 'R' if 'R' in file_name.split('/')[-1] else 'L'
 # file = {'file': open('/home/filipkr/Documents/xjob/vids/real/Videos/SHIELD/shield-SLS/09SLS1R.mp4', 'rb')}
 # file = {'file': open('/home/filipkr/Documents/xjob/app-mm/03SLS1R_MUSSE.mts', 'rb')}
 # file = {'file': open('/home/filipkr/Documents/xjob/vids/real/Videos/Hip-pain/hipp-SLS/10SLS1R.mp4', 'rb')}
-file = {'file': open('/home/filipkr/Desktop/11_R_SLS_4.mp4', 'rb')}
+#file = {'file': open('/home/filipkr/Desktop/11_R_SLS_4.mp4', 'rb')}
 # file = {'file': open('/home/filipkr/Documents/xjob/vids/real/Videos/SHIELD/shield-SLS/09SLS1R.mp4', 'rb')}
+file = {'file': open('vid.mts', 'rb')}
 # file = {'file': open(file_name, 'rb')}
 # file['file'].close()
 # url = 'http://0.0.0.0:5000/'
-url_base = 'http://0.0.0.0:5000/'
+url_base = 'http://0.0.0.0:3000/'
 #url_base = 'https://poe-analysis.herokuapp.com/'
 url_end = ''
 # url_end = 'get_latest'
