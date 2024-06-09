@@ -12,7 +12,7 @@ configs/*
 # custom, such as other repos:
 
 # large files
-*.mts
+#*.mts
 *.hdf5
 *.pth
 # singularity
