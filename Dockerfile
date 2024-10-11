@@ -1,5 +1,5 @@
 FROM python:3.7.11-slim-bullseye
-RUN apt-get update && apt-get install wget git gcc g++ libgl1 libglib2.0-0 libsm6 libxrender1 libxext6 -y
+RUN apt-get update && apt-get install wget git gcc g++ libgl1 libglib2.0-0 libsm6 libxrender1 libxext6 libtinfo5 -y
 WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 RUN python3.7 -m venv /home/myuser/venv
