@@ -2,6 +2,7 @@ import sys
 import os
 from argparse import Namespace
 import backend_utils
+# import cv2
 
 BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
@@ -46,12 +47,23 @@ def extract_reps(data, fps):
     return get_datasets(rep_args, data, fps)
 
 
-def pipe(vid, id, leg, attempt, debug):
+def pipe(vid, id, leg, attempt, file, debug):
     print(id)
     open('ONGOING', 'w').close()
     s3_base = os.path.dirname(vid)
     # local_vid_path = 'vid.' + vid.split('.')[-1]
-    local_vid_path = '/app/dummy-data/950203/ATTEMPT1/vid.mts'
+    local_vid_path = '/app/dummy-data/950203/vid.mts'
+    # result = cv2.VideoWriter('filename.avi',  
+    #                      cv2.VideoWriter_fourcc(*'MJPG'), 
+    #                      10, size) 
+    # file.save(local_vid_path)
+    # file.close()
+    print('writing file')
+    # print(file)
+    with open(local_vid_path, 'wb') as fo:
+        fo.write(file)
+    print(local_vid_path)
+    # local_vid_path = '/app/dummy-data/950203/ATTEMPT1/vid.mts'
     ONGOING = os.path.join(s3_base, 'ONGOING')
 
     uploaded = backend_utils.upload_to_aws('ONGOING', ONGOING)

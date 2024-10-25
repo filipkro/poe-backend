@@ -306,6 +306,7 @@ def upload_video():
         (and frames between repetitions, TO BE IMPLEMENTED).
         Video provided as file in files.
     '''
+    import cv2
     id = backend_utils.get_variable_from_req(request, 'id')
     print(f'Upload for user with id {id}')
     if id is None:
@@ -356,8 +357,11 @@ def upload_video():
 
         file_path = os.path.join('/app', filename)
         file.save(file_path)
+        print(type(file))
         file.close()
-
+        # cap = cv2.VideoCapture(file_path)
+        with open(file_path, 'rb') as fi:
+            file = fi.read()
         s3_name = f'users/{id}/ATTEMPT{attempt}/vid.'
         s3_name = s3_name + filename.split('.')[-1] if '.' in filename else \
             s3_name + 'mp4'
@@ -366,7 +370,7 @@ def upload_video():
         os.remove(file_path)
         if uploaded:
             print('upload_video filename: ' + filename)
-            status = backend_utils.predict(s3_name, id, leg, attempt=attempt,
+            status = backend_utils.predict(s3_name, id, leg, file, attempt=attempt,
                                            debug=debug)
             return f"{filename} uploaded,\n{status}", 200
         else:

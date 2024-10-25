@@ -215,9 +215,9 @@ def get_result_for_user(id):
     return 0
 
 
-def predict(vid, id, leg, attempt=1, debug=None):
+def predict(vid, id, leg, file, attempt=1, debug=None):
     vid = '/app/dummy-data/950203/ATTEMPT1/vid.mts'
-    job = q.enqueue(pipeline.pipe, args=(vid, id, leg, attempt, debug),
+    job = q.enqueue(pipeline.pipe, args=(vid, id, leg, attempt, file, debug),
                     job_timeout=-1)
 
     return (f"Prediction for {vid} started!\nTask ({job.id})" +
