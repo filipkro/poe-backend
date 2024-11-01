@@ -216,7 +216,7 @@ def loop(args, rotate, bbox, rotate_180=False, t0=time.perf_counter(),
                 img2save = cv2.resize(vis_img, (int(vis_img.shape[0]/5),
                                                 int(vis_img.shape[1])),
                                       interpolation=cv2.INTER_AREA)
-                cv2.imwrite('/app/debug.jpg', img2save)
+                cv2.imwrite(f"{args.video_path.split('.')[0]}.jpg", img2save)
                 del img2save
 
             if cv2.waitKey(1) & 0xFF == ord('q'):

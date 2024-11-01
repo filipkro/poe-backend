@@ -18,203 +18,6 @@ BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
 # del config, ConfigParser
 
-app.config['UPLOAD_FOLDER'] = '/data'
-app.config['UPLOAD_EXTENSIONS'] = ['mts', 'mp4', 'mpeg4', 'avi']
-app.config['MAX_CONTENT_LENGTH'] = 64 * 1024 * 1024
-app.secret_key = "secret key"
-
-
-@app.route('/get_video', methods=['GET'])
-def get_video():
-    """
-        Download video, specified by id and attempt.
-        ---
-        parameters:
-          - in: form-data
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: unique identification number
-                attempt:
-                  type: string
-                  description: specifies which attempt to get, if not specified - latest video is downloaded
-        responses:
-          - 200:
-              descprition: Successfully downloaded file
-              content:
-                type: binary
-                description: video file
-            400:
-              description: No id provided
-              content:
-                type: string
-                description: error message
-            404:
-              description: Requested user or attempt not found
-              content:
-                type: string
-                description: error message
-            501:
-              description: Error when downloading files from S3
-              content:
-                type: string
-                description: error message
-            500:
-              content:
-                type: string
-                description: error message
-    """
-    id = backend_utils.get_variable_from_req(request, 'id')
-    print(f'Get video for user with id {id}')
-    if id is None:
-        return "No id provided", 400
-    attempt = backend_utils.get_variable_from_req(request, 'attempt')
-    if attempt is None:
-        attempt = backend_utils.get_attempt_nbr(id) - 1
-
-    if not backend_utils.check_user_exist(id):
-        return "User not in database", 404
-
-    prefix = f'users/{id}/ATTEMPT{attempt}/vid'
-
-    if not backend_utils.file_on_aws(prefix):
-        return "Attempt not in database", 404
-
-    # s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
-    #                   aws_secret_access_key=SECRET_KEY)
-
-    # s3_file = s3.list_objects(Bucket='poe-uploads',
-    #                           Prefix=prefix)['Contents'][0]['Key']
-
-    # file = 'vid.' + s3_file.split('.')[-1]
-    file = '/app/dummy-data/950203/ATTEMPT1/vid.mts'
-    s3_file = 'dummy-data/950203/ATTEMPT1/vid.mts'
-    # file = 'inference/test-flask/02SLS1L.mp4'
-    downloaded, error = backend_utils.download_from_aws(file, s3_file)
-
-    if downloaded:
-        return send_file(file, download_name='vid.' + s3_file.split('.')[-1],
-                         mimetype='video/mp4'), 200
-        # return "file sent ?"
-
-    return error, 501
-
-
-@app.route('/delete_user/<id>', methods=['DELETE'])
-def delete_user(id=None):
-    """
-        Delete user, including all data, from database, specified by id.
-        ---
-        parameters:
-          - id: unique identification number
-        responses:
-          - 200:
-              descprition: Successfully downloaded file
-              content: [binary] video file
-          - 400:
-              description: No id provided
-              content: [string] error message
-          - 404:
-              description: Requested user or attempt not found
-              content: [string] error message
-          - 501:
-              description: Error when downloading files from S3
-              content: [string] error message
-          - 500:
-              description: Error
-    """
-    # id = backend_utils.get_variable_from_req(request, 'id')
-    print(f'Deleting user with id {id}')
-    if id is None:
-        return "No id provided", 400
-
-    print(f'DELETE {id}')
-
-    if not backend_utils.check_user_exist(id):
-        print('user not in database')
-        return "User not in database", 404
-
-    # s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
-    #                   aws_secret_access_key=SECRET_KEY)
-
-    # files = s3.list_objects(Bucket='poe-uploads',
-    #                         Prefix=f'users/{id}')['Contents']
-    # keys = [{'Key': key['Key']} for key in files]
-    # keys.append({'Key': f'users/{id}'})
-    # keys = {'Objects': keys}
-
-    # deleted = s3.delete_objects(Bucket='poe-uploads', Delete=keys)
-    deleted = True
-    if deleted:
-        print(f'Successfully deleted user {id}')
-        return 'Delete successful', 200
-    else:
-        print(f'Could not delete user {id}')
-        return 'Delete unsuccessful', 501
-
-
-@app.route('/get_user', methods=['GET'])
-def get_user():
-    '''
-        Download user information, such as injured leg, length, weight.
-        Specified by id.
-    '''
-    id = backend_utils.get_variable_from_req(request, 'id')
-    print(f'Get user with id {id}')
-    if id is None:
-        return "No id provided", 400
-
-    if not backend_utils.check_user_exist(id):
-        print('user not in database')
-        return "User not in database", 404
-
-    s3_file = 'dummy-data/950203/user_params.json'
-
-    file = '/app/dummy-data/950203/user_params.json'
-
-    downloaded, error = backend_utils.download_from_aws(file, s3_file)
-    print(os.listdir('/app'))
-    if downloaded:
-        f = open(file, 'r')
-        data = json.load(f)
-        f.close()
-        return flask.jsonify(data), 200
-        # return "file sent ?"
-
-    return error, 501
-
-
-@app.route('/get_result', methods=['GET'])
-def get_result():
-    '''
-        Download latest result, specified by id.
-    '''
-
-    id = backend_utils.get_variable_from_req(request, 'id')
-    print(f'Get result for user with id {id}')
-    if id is None:
-        return "No id provided", 400
-
-    if not backend_utils.check_user_exist(id):
-        return "User not in database", 404
-
-    attempt = backend_utils.get_variable_from_req(request, 'attempt')
-    print(f'Attempt {id}')
-    if attempt is None:
-        attempt = backend_utils.get_attempt_nbr(id) - 1
-
-    if backend_utils.check_ongoing(id, attempt):
-        return "Assessment not finished", 201
-    if not backend_utils.check_result_available(id, attempt):
-        return "Attempt not in database", 404
-
-    res = backend_utils.get_results(id, attempt)
-    if type(res) == dict:
-        return flask.jsonify(res), 200
-    else:
-        return res, 501
 
 
 @app.route('/ongoing', methods=['GET'])
@@ -238,66 +41,26 @@ def get_ongoing():
     else:
         return "Finished", 201
 
-
-@app.route('/get_all', methods=['GET'])
-def get_all_results():
+@app.route('/analyse_video', methods=['POST'])
+def analyse_video():
     '''
-        Download all results for user, specified by id.
+        Analyse video specified by path
     '''
-
-    id = backend_utils.get_variable_from_req(request, 'id')
-    print(f'Get all for user with id {id}')
-    if id is None:
-        return "No id provided", 400
-
-    if not backend_utils.check_user_exist(id):
-        return "User not in database", 404
-
-    last_attempt = backend_utils.get_attempt_nbr(id)
-    results = []
-
-    for attempt in range(1, last_attempt):
-        if backend_utils.check_ongoing(id, attempt) or \
-                not backend_utils.check_result_available(id, attempt):
-
-            #     results[f'attempt{attempt}'] = 'Not available'
-            # else:
-            #     results[f'attempt{attempt}'] = backend_utils.get_results(id,
-            #                                                              attempt)
-            results.append('Not available')
-        else:
-            results.append(backend_utils.get_results(id, attempt))
-
-    return flask.jsonify(results), 200
+    path = backend_utils.get_variable_from_req(request, 'path')
+    leg = backend_utils.get_variable_from_req(request, 'leg')
+    debug = backend_utils.get_variable_from_req(request, 'debug')
+    print(path)
+    status = backend_utils.predict(path, leg, debug=debug)
+    return f"{path} to be analysed,\n{status}", 200
 
 
-@app.route('/get_repetition_result', methods=['GET'])
-def get_repetition():
-    '''
-        Download predictions for all repetitions, specified by id and attempt.
-    '''
+@app.route('/tt', methods=['POST'])
+def tt():
+    print('writing file??')
+    with open('/data/out.txt', 'w') as fo:
+        fo.write('lol')
 
-    id = backend_utils.get_variable_from_req(request, 'id')
-    print(f'Get repetition for user with id {id}')
-    if id is None:
-        return "No id provided", 400
-    attempt = backend_utils.get_variable_from_req(request, 'attempt')
-    if attempt is None:
-        attempt = backend_utils.get_attempt_nbr(id) - 1
-
-    if not backend_utils.check_user_exist(id):
-        return "User not in database", 404
-    if backend_utils.check_ongoing(id, attempt):
-        return "Assessment not finished", 201
-    if not backend_utils.check_result_available(id, attempt):
-        return "Attempt not in database", 404
-
-    res = backend_utils.get_results(id, attempt, with_reps=True)
-    if type(res) == dict:
-        return flask.jsonify(res), 200
-    else:
-        return res, 500
-
+    return "ok", 200
 
 @app.route('/upload', methods=['POST'])
 def upload_video():

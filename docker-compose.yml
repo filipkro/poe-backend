@@ -8,7 +8,7 @@ services:
       - PYTHONUNBUFFERED=1
     image: app-rq
     volumes:
-      - shared-data:/data
+      - /Users/filipkro/Library/CloudStorage/OneDrive-Chalmers/Documents/poe-backend/test_data:/data
     ports:
       - 3000:3000
     command: gunicorn -b :3000 backend:app
@@ -18,7 +18,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
-      - shared-data:/data
+      - /Users/filipkro/Library/CloudStorage/OneDrive-Chalmers/Documents/poe-backend/test_data:/data
     depends_on:
       - redis
     command: rqworker --name worker --url redis://redis:6379/0
@@ -26,5 +26,3 @@ services:
   redis:
     image: redis
 
-volumes:
-  shared-data:
