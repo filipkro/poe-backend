@@ -36,7 +36,7 @@ url_end = 'analyse_video'
 # url_end = 'get_repetition_result'
 # url_end = 'delete_user'
 url = url_base + url_end
-data = {'path': 'vid.mts', 'leg': 'R'}
+data = {'path': 'vid.mp4', 'leg': 'R'}
 response = requests.post(url, data=data)
 if response.ok:
     print(response)
