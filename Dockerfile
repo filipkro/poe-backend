@@ -8,14 +8,24 @@ RUN /home/myuser/venv/bin/python3.7 -m pip install --upgrade pip
 RUN pip3 install --no-cache-dir wheel
 RUN pip3 install numpy==1.19.5
 RUN echo lol
+
 RUN pip3 install --no-cache-dir -r requirements.txt
 RUN pip3 install mmcv-full==1.1.5
 RUN python -c "import mmcv; print(mmcv.__file__)"
 
 ENV PYTHONUNBUFFERED 1
 
+RUN wget https://download.openxlab.org.cn/models/mmdetection/FasterR-CNN/weight/faster-rcnn_r50_fpn_1x_coco -O faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth
+
+RUN wget https://download.openmmlab.com/mmpose/top_down/hrnet/hrnet_w32_coco_wholebody_256x192_dark-469327ef_20200922.pth -O hrnet_w32_coco_wholebody_256x192_dark-469327ef_20200922.pth
+
+
+
 COPY . /app
 
-RUN wget https://download.openxlab.org.cn/models/mmdetection/FasterR-CNN/weight/faster-rcnn_r50_fpn_1x_coco -O /app/pose/mmdet-files/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth
+RUN mv faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth /app/pose/mmdet-files/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth
 
-RUN wget https://download.openmmlab.com/mmpose/top_down/hrnet/hrnet_w32_coco_wholebody_256x192_dark-469327ef_20200922.pth -O /app/pose/mmpose-files/hrnet_w32_coco_wholebody_256x192_dark-469327ef_20200922.pth
+RUN mv hrnet_w32_coco_wholebody_256x192_dark-469327ef_20200922.pth /app/pose/mmpose-files/hrnet_w32_coco_wholebody_256x192_dark-469327ef_20200922.pth
+
+
+
