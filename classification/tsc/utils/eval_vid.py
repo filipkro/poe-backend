@@ -1,18 +1,27 @@
 from argparse import ArgumentParser, ArgumentTypeError
 import os
+import numpy as np
+print('np imported')
+from tensorflow.keras import models as keras_models
+print('tf imported')
+import coral_ordinal as coral
+print('coral imported')
+from confusion_utils import ConfusionCrossEntropy
+print('after import')
 
 
 def main(args, datasets=None, datasets100=None, base_path=''):
     print('before import')
     # import tensorflow.keras as keras
-    from tensorflow.keras import models as keras_models
+    
+    # import numpy as np
+    # print('np imported')
+    # import coral_ordinal as coral
+    # print('coral imported')
+    # from confusion_utils import ConfusionCrossEntropy
+    # print('after import')
+    # from tensorflow.keras import models as keras_models
     print('keras imported')
-    import numpy as np
-    print('np imported')
-    import coral_ordinal as coral
-    print('coral imported')
-    from confusion_utils import ConfusionCrossEntropy
-    print('after import')
     poes = ['femval', 'trunk', 'hip', 'kmfp']
     results = {}
     for poe in poes:
