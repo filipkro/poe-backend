@@ -1,5 +1,6 @@
 import sys
 import os, json
+import pickle
 from argparse import Namespace
 import backend_utils
 # import cv2
@@ -46,6 +47,10 @@ def extract_reps(data, fps):
 
     return get_datasets(rep_args, data, fps)
 
+def assess_subject(datasets, datasets100):
+    from eval_vid import main as main_asses
+
+    return main_asses(Namespace(), datasets, datasets100, BASE)
 
 # def pipe(vid, id, leg, attempt, file, debug):
 def pipe(file_path, leg, debug):
@@ -54,21 +59,7 @@ def pipe(file_path, leg, debug):
     # s3_base = os.path.dirname(vid)
     # local_vid_path = 'vid.' + vid.split('.')[-1]
     local_vid_path = os.path.join('/data', file_path)
-    # result = cv2.VideoWriter('filename.avi',  
-    #                      cv2.VideoWriter_fourcc(*'MJPG'), 
-    #                      10, size) 
-    # file.save(local_vid_path)
-    # file.close()
-    # print('writing file')
-    # print(file)
-    # with open(local_vid_path, 'wb') as fo:
-    #     fo.write(file)
-    # print(local_vid_path)
-    # local_vid_path = '/app/dummy-data/950203/ATTEMPT1/vid.mts'
-    # ONGOING = os.path.join(s3_base, 'ONGOING')
 
-
-    # uploaded = backend_utils.upload_to_aws('ONGOING', ONGOING)
     if debug is None:
         # downloaded = backend_utils.download_from_aws(local_vid_path, vid)
 
@@ -76,71 +67,25 @@ def pipe(file_path, leg, debug):
         poses, fps = run_video_detection(local_vid_path, leg)
         # os.remove(local_vid_path)
         print('keypoints found')
-        # all_data = {'poses': poses, 'fps': fps}
-        # import pickle  # noqa
-        # f = open('poses.pkl', 'wb')
-        # pickle.dump(all_data, f)
-        # f.close()
-
-        # os.remove('poses.pkl')
 
         datasets, datasets100 = extract_reps(poses, fps)
         print('datasets found')
-        # os.
-        # uploaded = backend_utils.upload_to_aws('/app/debug.jpg',
-        #                                         os.path.join(s3_base,
-        #                                                     'debug.jpg'))
-        # if not uploaded:
-        #     return "issue connecting S3 when uploading data, aborting..."
-        # os.remove('/app/debug.jpg')
-
-        # fp = '/app/data.pkl'
-        # fp100 = '/app/data_100.pkl'
-        # f = open(fp, 'wb')
-        # pickle.dump(datasets, f)
-        # f.close()
-        # f = open(fp100, 'wb')
-        # pickle.dump(datasets100, f)
-        # f.close()
-        # uploaded = backend_utils.upload_to_aws(fp, os.path.join(s3_base,
-        #                                                         'data.pkl'))
-        # if not uploaded:
-        #     return "issue connecting S3 when uploading data, aborting..."
-        # uploaded = backend_utils.upload_to_aws(fp100,
-        #                                         os.path.join(s3_base,
-        #                                                     'data_100.pkl'))
-        # if not uploaded:
-        #     return "issue connecting S3 when uploading data, aborting..."
-
-        # os.remove(fp)
-        # os.remove(fp100)
-
-        # del f, pickle, fp, fp100
-
-        from eval_vid import main as assess_subject
-        results = assess_subject(Namespace(), datasets=datasets,
-                                datasets100=datasets100,
-                                base_path=BASE)
-
+        # with open('/data/datasets.pkl', 'wb') as fo:
+        #     pickle.dump({'data': datasets, 'data100': datasets100}, fo)
+        # with open('/data/datasets.pkl', 'rb') as fi:
+        #     d = pickle.load(fi)
+        #     datasets = d['data']
+        #     datasets100 = d['data100']
+        # print('data saved')
+        print('deleting functions...')
+        # del poses
+        # del extract_reps
+        
+        results = assess_subject(datasets, datasets100)
+        print('results found')
         with open(f"{local_vid_path.split('.')[0]}.json", 'w') as fo:
             json.dump(results, fo)
-        # fp = 'results.pkl'
-        # f = open(fp, 'wb')
-        # import pickle  # noqa
-        # pickle.dump(results, f)
-        # f.close()
-
-        # uploaded = backend_utils.upload_to_aws(fp, os.path.join(s3_base,
-        #                                                         'results.pkl'))
-        # os.remove(fp)
-        # if not uploaded:
-        #     return "Could not save result to S3"
-
-        # deleted = backend_utils.delete_from_aws(ONGOING)
-        # if not deleted:
-        #     return "ONGOING flag could not be deleted from S3"
-
-
+      
 def pipe_debug(vid, id, leg):
     import pickle
     f = open(os.path.join(BASE, 'inference/datadebug/data.pkl'), 'rb')

@@ -1,20 +1,18 @@
 #numpy==1.19.5
-tensorflow==2.10.0
+tensorflow-cpu==2.9.2
 git+https://github.com/filipkro/coral-ordinal/
 flask
 gunicorn
 -f https://download.pytorch.org/whl/torch_stable.html
 torch==1.7.1
 -f https://download.pytorch.org/whl/torch_stable.html
-torchvision==0.9.1
-mmcv==1.1.6
+# torchvision==0.9.1
+torchvision==0.8.2
+# mmcv==1.1.6
 #mmcv-full==1.1.5
 scipy==1.7.1
 opencv-python==4.5.3.56
 redis
 rq
 Flask-RQ2
-psycopg2-binary==2.9.1
-boto3==1.18.40
-botocore==1.21.40
-flasgger==0.9.5
+# flasgger==0.9.5

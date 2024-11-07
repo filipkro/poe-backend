@@ -3,11 +3,16 @@ import os
 
 
 def main(args, datasets=None, datasets100=None, base_path=''):
-    import tensorflow.keras as keras
+    print('before import')
+    # import tensorflow.keras as keras
+    from tensorflow.keras import models as keras_models
+    print('keras imported')
     import numpy as np
+    print('np imported')
     import coral_ordinal as coral
+    print('coral imported')
     from confusion_utils import ConfusionCrossEntropy
-
+    print('after import')
     poes = ['femval', 'trunk', 'hip', 'kmfp']
     results = {}
     for poe in poes:
@@ -52,9 +57,9 @@ def main(args, datasets=None, datasets100=None, base_path=''):
         all_probs = np.zeros((len(models), x.shape[0], 3))
 
         for model_i, model_path in enumerate(paths):
-
+            # print(model_path)
             input = x100 if '-100-' in model_path else x
-            model = keras.models.load_model(model_path, custom_objects={
+            model = keras_models.load_model(model_path, custom_objects={
                                             'CoralOrdinal': coral.CoralOrdinal,
                                             'OrdinalCrossEntropy':
                                             coral.OrdinalCrossEntropy,
@@ -68,20 +73,28 @@ def main(args, datasets=None, datasets100=None, base_path=''):
             # print(poe)
             # print(model_path)
             result = model.predict(input)
+            # print(model.summary())
+            # print(model_path)
+            # print(input.shape)
+            # print(result.shape)
             del model
             probs = coral.ordinal_softmax(
                 result).numpy() if 'coral' in model_path else result
-
+            # probs = result
+            # print(probs.shape)
+            # print(weights[model_i, ...].shape)
+            # print(result)
+            # print(probs)
             probs = probs * weights[model_i, ...]
-            print(probs)
+            # print(probs)
 
             all_probs[model_i, ...] = probs
 
         ensemble_probs = np.sum(all_probs, axis=0)
-        print(ensemble_probs)
+        # print(ensemble_probs)
         # threshold
         ensemble_probs = (ensemble_probs > 0.2) * ensemble_probs
-        print(ensemble_probs)
+        # print(ensemble_probs)
         # ev fel shape ....
         summed = np.mean(ensemble_probs, axis=0)
         print('RESULT')
@@ -96,8 +109,8 @@ def main(args, datasets=None, datasets100=None, base_path=''):
         print(f'Summed-score: {summed}')
 
         print(ensemble_probs)
-        res = {'pred': pred_combined, 'conf': summed,
-               'detailed': ensemble_probs}
+        res = {'pred': pred_combined, 'conf': summed.tolist(),
+               'detailed': ensemble_probs.tolist()}
         results[poe] = res
 
     return results
