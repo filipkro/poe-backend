@@ -1,6 +1,10 @@
 import os
 import sys
 from argparse import ArgumentParser, ArgumentTypeError
+# from mmpose.apis import (inference_top_down_pose_model,
+#  init_pose_model, vis_pose_result)
+# from mmpose.apis import inference_top_down_pose_model, init_pose_model
+# from mmdet.apis import inference_detector, init_detector
 
 import cv2
 import time
@@ -139,6 +143,9 @@ def loop(args, rotate, bbox, rotate_180=False, t0=time.perf_counter(),
                 int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
     print(size)
+    args.skip_rate = 2
+    frame_to_skip = -1
+    skip_count = frame_to_skip + 1
 
     m_dim = max(size)
     if args.save_vid:
@@ -168,7 +175,9 @@ def loop(args, rotate, bbox, rotate_180=False, t0=time.perf_counter(),
 
         if True:
             # check every nd frame
-            if frame % args.skip_rate == 0:
+            # if frame % args.skip_rate == 0:
+            if skip_count > frame_to_skip:
+                skip_count = 0
                 # test a single image, with a list of bboxes.
                 pose_results = inference_top_down_pose_model(pose_model, img,
                                                              bbox,
@@ -195,6 +204,8 @@ def loop(args, rotate, bbox, rotate_180=False, t0=time.perf_counter(),
                     print('lol')
 
             else:
+                skip_count += 1
+                print('skipping')
                 pose_results = prev_pose
 
             vis_img = vis_pose_result(pose_model, img, pose_results,
