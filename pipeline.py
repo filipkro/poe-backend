@@ -2,7 +2,8 @@ import sys
 import os, json
 import pickle
 from argparse import Namespace
-import backend_utils
+import time
+# import backend_utils
 # import cv2
 
 BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
@@ -10,7 +11,7 @@ BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(os.path.join(BASE, 'pose/analysis'))
 sys.path.append(os.path.join(BASE, 'pose/analysis/utils'))
 sys.path.append(os.path.join(BASE, 'classification/tsc/utils'))
-
+from eval_vid import main as main_asses
 
 def run_video_detection(vid, leg):
     from analyse_vid_light import start as start_detection
@@ -48,7 +49,7 @@ def extract_reps(data, fps):
     return get_datasets(rep_args, data, fps)
 
 def assess_subject(datasets, datasets100):
-    from eval_vid import main as main_asses
+    # from eval_vid import main as main_asses
 
     return main_asses(Namespace(), datasets, datasets100, BASE)
 
@@ -67,7 +68,12 @@ def pipe(file_path, leg, debug):
         poses, fps = run_video_detection(local_vid_path, leg)
         # os.remove(local_vid_path)
         print('keypoints found')
-
+        # with open('/data/poses.pkl', 'wb') as fo:
+        #     pickle.dump({'poses': poses, 'fps': fps}, fo)
+        # with open('/data/poses.pkl', 'rb') as fi:
+        #     d = pickle.load(fi)
+        # poses = d['poses']
+        # fps = d['fps']
         datasets, datasets100 = extract_reps(poses, fps)
         print('datasets found')
         # with open('/data/datasets.pkl', 'wb') as fo:
@@ -77,10 +83,10 @@ def pipe(file_path, leg, debug):
         #     datasets = d['data']
         #     datasets100 = d['data100']
         # print('data saved')
-        print('deleting functions...')
+        # print('deleting functions...')
         # del poses
         # del extract_reps
-        
+        # time.sleep(30.0)
         results = assess_subject(datasets, datasets100)
         print('results found')
         with open(f"{local_vid_path.split('.')[0]}.json", 'w') as fo:
@@ -95,7 +101,7 @@ def pipe_debug(vid, id, leg):
     datasets100 = pickle.load(f)
     f.close()
 
-    del pickle, f
+    # del pickle, f
 
     from eval_vid import main as assess_subject
     results = assess_subject(Namespace(), datasets=datasets,
