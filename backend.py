@@ -22,20 +22,19 @@ def get_ongoing():
         Returns 'Ongoing' if assessment is ongoing and 'Finished' if it is
         completed.
     '''
-    raise NotImplementedError("Ongoing is not implemented yet")
-    id = backend_utils.get_variable_from_req(request, 'id')
-    print(f'Check ongoing for user with id {id}')
+    # raise NotImplementedError("Ongoing is not implemented yet")
+    # id = backend_utils.get_variable_from_req(request, 'id')
+    vid = backend_utils.get_variable_from_req(request, 'path')
+    print(f'Check ongoing for video {vid}')
     if id is None:
         return "No id provided", 400
 
-    if not backend_utils.check_user_exist(id):
-        return "User not in database", 404
-
-    attempt = backend_utils.get_attempt_nbr(id) - 1
-    if backend_utils.check_ongoing(id, attempt):
+    if backend_utils.check_ongoing(vid):
         return "Ongoing", 200
-    else:
+    elif backend_utils.check_completed(vid):
         return "Finished", 201
+    else:
+        return "Unknown", 401
 
 @app.route('/analyse_video', methods=['POST'])
 def analyse_video():

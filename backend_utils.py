@@ -25,7 +25,13 @@ BASE = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 #SECRET_KEY = config.get('aws', 'secret')
 
 #del config, ConfigParser
+def check_ongoing(vid):
+    path = vid.split('.')[0] + '-ONGOING'
+    return os.path.exists(os.path.join('/data', path))
 
+def check_completed(vid):
+    path = vid.split('.')[0] + '.json'
+    return os.path.exists(os.path.join('/data', path))
 
 def get_variable_from_req(request, key):
     var = request.form.get(key)
@@ -55,10 +61,6 @@ def file_on_aws(file):
 
 def check_user_exist(id):
     return file_on_aws(f'users/{id}')
-
-
-def check_ongoing(id, attempt):
-    return file_on_aws(f'users/{id}/ATTEMPT{attempt}/ONGOING')
 
 
 def check_result_available(id, attempt):

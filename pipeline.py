@@ -56,10 +56,13 @@ def assess_subject(datasets, datasets100):
 # def pipe(vid, id, leg, attempt, file, debug):
 def pipe(file_path, leg, debug):
     print(id)
-    open('ONGOING', 'w').close()
+    
     # s3_base = os.path.dirname(vid)
     # local_vid_path = 'vid.' + vid.split('.')[-1]
     local_vid_path = os.path.join('/data', file_path)
+    ongoing_file = local_vid_path.split('.')[0] + '-ONGOING'
+
+    open(ongoing_file, 'w').close()
 
     if debug is None:
         # downloaded = backend_utils.download_from_aws(local_vid_path, vid)
@@ -91,6 +94,8 @@ def pipe(file_path, leg, debug):
         print('results found')
         with open(f"{local_vid_path.split('.')[0]}.json", 'w') as fo:
             json.dump(results, fo)
+
+        os.remove(ongoing_file)
       
 def pipe_debug(vid, id, leg):
     import pickle
