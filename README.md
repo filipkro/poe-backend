@@ -21,3 +21,9 @@ Specify filepath for mounting in `docker-compose.yml`. The endpoint to call to a
 ```
 {'path': 'vid.mp4', 'leg': 'R'}
 ```
+
+Query for ongoing analysis on the /ongoing (GET) endpoint, provide the video you're querying for as follows:
+
+```
+{'path': 'vid.mp4'}
+```
