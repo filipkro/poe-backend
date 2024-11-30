@@ -22,11 +22,11 @@ def main(args, datasets=None, datasets100=None, base_path=''):
     # print('after import')
     # from tensorflow.keras import models as keras_models
     print('keras imported')
-    poes = ['femval', 'trunk', 'hip', 'kmfp']
+    poes = ['femval', 'trunk', 'hip', 'kmfp', 'fms']
     results = {}
     for poe in poes:
         # model_path = '/home/filipkr/Documents/xjob/training/ensembles'
-        model_path = os.path.join(base_path, f'models/{poe}')
+        model_path = os.path.join(base_path, f'models/{poe}_aug')
         if datasets is None or datasets100 is None:
             x = np.load(os.path.join(args.root, poe + '.npy'))
             x100 = np.load(os.path.join(args.root, poe + '-100.npy'))
@@ -36,29 +36,41 @@ def main(args, datasets=None, datasets100=None, base_path=''):
 
         if poe == 'femval':
             # lit = 'Olga-Tokarczuk'
-            models = ['coral-100-7000', 'xx-coral-100-7000',
-                      'xx-conf-100-7000', 'xx-conf-100-11000', 'xx-conf-9000']
-            weights = np.array([[1/3, 1.25/3, 1/3], [1/3, 1.25/3, 1/3],
-                                [1/3, 0, 0], [0, 0, 1/3], [0, 1.25/3, 0]])
+            models = ['coral-1', 'conf-0', 'conf-1', 'conf-2']
+            weights = np.array([[0.6,0.6,1],[0.4,0,0], [0,0.4,0],[0,0,0.1]])
+            # models = ['coral-100-7000', 'xx-coral-100-7000',
+            #           'xx-conf-100-7000', 'xx-conf-100-11000', 'xx-conf-9000']
+            # weights = np.array([[1/3, 1.25/3, 1/3], [1/3, 1.25/3, 1/3],
+            #                     [1/3, 0, 0], [0, 0, 1/3], [0, 1.25/3, 0]])
+            
         elif poe == 'hip':
             # lit = 'Sigrid-Undset'
-            models = ['coral-100-13000', 'coral-13000', 'conf-100-10000',
-                      'conf-10001', 'xx-coral-100-10003']
-            weights = np.array([[1/4, 1.05/4, 1.5/4], [1/4, 1.05/4, 1.5/4],
-                                [1/2, 0, 0], [0, 1.05/2, 0], [0, 0, 1.5/2]])
+            models = ['coral-1', 'conf-0', 'conf-100-1', 'conf-100-2']
+            weights = np.array([[0.5,0.5,0.6], [0.5, 0, 0], [0, 0.5, 0], [0,0,0.5]])
+            # models = ['coral-100-13000', 'coral-13000', 'conf-100-10000',
+            #           'conf-10001', 'xx-coral-100-10003']
+            # weights = np.array([[1/4, 1.05/4, 1.5/4], [1/4, 1.05/4, 1.5/4],
+            #                     [1/2, 0, 0], [0, 1.05/2, 0], [0, 0, 1.5/2]])
         elif poe == 'kmfp':
             # lit = 'Mikhail-Sholokhov'
-            models = ['inception-3010', 'xx-inception-3010', 'xx-conf-3010',
-                      'conf-100-13000', 'xx-conf-3025']
-            weights = np.array([[1/3, 1.25*1/3, 1.25/3],
-                                [1/3, 1.25*1/3, 1.25/3], [1/3, 0, 0],
-                                [0, 1.25*1/3, 0], [0, 0, 1.25/3]])
+            models = ['coral-1', 'conf-0', 'conf-2']
+            weights = np.array([[0.6,1.1,0.9], [0.4,0,0], [0,0,0.3]])
+            # models = ['inception-3010', 'xx-inception-3010', 'xx-conf-3010',
+            #           'conf-100-13000', 'xx-conf-3025']
+            # weights = np.array([[1/3, 1.25*1/3, 1.25/3],
+            #                     [1/3, 1.25*1/3, 1.25/3], [1/3, 0, 0],
+            #                     [0, 1.25*1/3, 0], [0, 0, 1.25/3]])
         elif poe == 'trunk':
             # lit = 'Isaac-Bashevis-Singer'
-            models = ['coral-100-11', 'coral-100-10', 'xx-conf-100-11',
-                      'conf-15', 'xx-coral-100-10']
-            weights = np.array([[1/3, 1.15/3, 1/3], [1/3, 1.15/3, 1/3],
-                                [1/3, 0, 0], [0, 1.15/3, 0], [0, 0, 1/3]])
+            models = ['coral-1', 'conf-0', 'conf-100-1', 'conf-2']
+            weights = np.array([[0.5,0.5,0.5], [0.5,0,0],[0,0.5,0],[0,0,0.5]])
+            # models = ['coral-100-11', 'coral-100-10', 'xx-conf-100-11',
+            #           'conf-15', 'xx-coral-100-10']
+            # weights = np.array([[1/3, 1.15/3, 1/3], [1/3, 1.15/3, 1/3],
+            #                     [1/3, 0, 0], [0, 1.15/3, 0], [0, 0, 1/3]])
+        elif poe == 'fms':
+            models = ['coral-1', 'conf-0', 'conf-100-1']
+            weights = np.array([[0.6,0.6,1.1], [0.4,0,0], [0,0.4,0]])
 
         # model_path = os.path.join(model_path, lit + '10')
         ensembles = [os.path.join(model_path, i) for i in models]
@@ -77,10 +89,10 @@ def main(args, datasets=None, datasets100=None, base_path=''):
                                             'ConfusionCrossEntropy':
                                             ConfusionCrossEntropy})
 
+            # print(model.summary())
             # print(input.shape)
             # print(lit)
-            # print(poe)
-            # print(model_path)
+            print(poe)
             result = model.predict(input)
             # print(model.summary())
             # print(model_path)

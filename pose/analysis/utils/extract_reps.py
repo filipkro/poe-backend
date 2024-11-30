@@ -2,14 +2,13 @@ import numpy as np
 from argparse import ArgumentParser, ArgumentTypeError
 import os
 
-
 femval_kpts = np.array([[6, 1], [12, 0], [14, 0]])
 femval_angles = [[14, 16]]
 femval_diffs = np.array([[]])
 
 trunk_kpts = np.array([[5, 0], [6, 0], [6, 1], [11, 0], [11, 1], [12, 0]])
 trunk_angles = []
-trunk_diffs = np.array([[[12, 0], [14, 0]]])
+trunk_diffs = np.array([[[12, 0], [14, 0]], [[14, 0], [20, 0]]])
 
 hip_kpts = np.array([[6, 0], [6, 1], [11, 1], [16, 1]])
 hip_angles = [[12, 14]]
@@ -20,15 +19,22 @@ kmfp_angles = [[16, 20]]
 kmfp_diffs = np.array([[[12, 0], [14, 0]], [[14, 0], [16, 0]],
                        [[14, 0], [20, 0]]])
 
-all_kpts = [femval_kpts, trunk_kpts, hip_kpts, kmfp_kpts]
-all_angles = [femval_angles, trunk_angles, hip_angles, kmfp_angles]
-all_diffs = [femval_diffs, trunk_diffs, hip_diffs, kmfp_diffs]
+fms_kpts = np.array([[5, 0], [5, 1], [11, 1], [12, 1], [14, 0], [14, 1],
+                     [20, 1], [21, 1], [22, 1]])
+fms_angles = [[12, 14], [14, 16], [14, 20], [16, 20]]
+fms_diffs = np.array([[[12, 0], [14, 0]], [[14, 0], [16, 0]], [[12, 0], [20, 0]],
+                    [[14, 0], [20, 0]]])
+
+all_kpts = [femval_kpts, trunk_kpts, hip_kpts, kmfp_kpts, fms_kpts]
+all_angles = [femval_angles, trunk_angles, hip_angles, kmfp_angles, fms_angles]
+all_diffs = [femval_diffs, trunk_diffs, hip_diffs, kmfp_diffs, fms_diffs]
 
 femval_data = []
 trunk_data = []
 hip_data = []
 kmfp_data = []
-all_data = [femval_data, trunk_data, hip_data, kmfp_data]
+fms_data = []
+all_data = [femval_data, trunk_data, hip_data, kmfp_data, fms_data]
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -119,8 +125,8 @@ def main(args, data, fps):
         motions[i, :max_idx, ...] = normalize_coords_motions(
             motions[i, :max_idx, ...])
 
-    datasets = {'femval': [], 'trunk': [], 'hip': [], 'kmfp': []}
-    poes = ['femval', 'trunk', 'hip', 'kmfp']
+    datasets = {'femval': [], 'trunk': [], 'hip': [], 'kmfp': [], 'fms': []}
+    poes = ['femval', 'trunk', 'hip', 'kmfp', 'fms']
     for KPTS, ANGLES, DIFFS, poe in zip(all_kpts, all_angles, all_diffs, poes):
         print(DIFFS)
         dataset = []

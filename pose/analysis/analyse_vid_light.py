@@ -163,75 +163,74 @@ def loop(args, rotate, bbox, rotate_180=False, t0=time.perf_counter(),
     while (cap.isOpened()):
         t1 = time.perf_counter()
         flag, img = cap.read()
+        # check every nd frame
+        # if frame % args.skip_rate == 0:
+        if skip_count > frame_to_skip:
+            skip_count = 0
 
-        if rotate:
-            img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-        if rotate_180:
-            img = cv2.rotate(img, cv2.ROTATE_180)
-        if args.flip:
-            img = cv2.flip(img, 1)
-        if not flag:
-            break
+            if rotate:
+                img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+            if rotate_180:
+                img = cv2.rotate(img, cv2.ROTATE_180)
+            if args.flip:
+                img = cv2.flip(img, 1)
+            if not flag:
+                break
 
-        if True:
-            # check every nd frame
-            # if frame % args.skip_rate == 0:
-            if skip_count > frame_to_skip:
-                skip_count = 0
-                # test a single image, with a list of bboxes.
-                pose_results = inference_top_down_pose_model(pose_model, img,
-                                                             bbox,
-                                                             bbox_thr=args.box_thr,
-                                                             format='xyxy',
-                                                             dataset=dataset)
+            # test a single image, with a list of bboxes.
+            pose_results = inference_top_down_pose_model(pose_model, img,
+                                                            bbox,
+                                                            bbox_thr=args.box_thr,
+                                                            format='xyxy',
+                                                            dataset=dataset)
 
-                t = time.perf_counter()
+            t = time.perf_counter()
 
-                print('Frame {:.0f} out of {:.0f} '.format(frame, frames) +
-                      'analysed in {:.4f} secs. '.format(t - t1) +
-                      'Total time: {:.4f} secs'.format(t - t0))
+            print('Frame {:.0f} out of {:.0f} '.format(frame, frames) +
+                    'analysed in {:.4f} secs. '.format(t - t1) +
+                    'Total time: {:.4f} secs'.format(t - t0))
 
-                # show the results
-                if np.shape(pose_results)[0] > 0:
-                    prev_pose = pose_results
+            # show the results
+            if np.shape(pose_results)[0] > 0:
+                prev_pose = pose_results
 
-                    poses[frame, ...] = pose_results[0]['keypoints'][:, 0:2] \
-                        if args.save_pixels else \
-                        pose_results[0]['keypoints'][:, 0:2] / m_dim
-
-                else:
-                    pose_results = prev_pose  # or maybe just skip saving
-                    print('lol')
+                poses[frame, ...] = pose_results[0]['keypoints'][:, 0:2] \
+                    if args.save_pixels else \
+                    pose_results[0]['keypoints'][:, 0:2] / m_dim
 
             else:
-                skip_count += 1
-                print('skipping')
-                pose_results = prev_pose
+                pose_results = prev_pose  # or maybe just skip saving
+                print('lol')
 
-            vis_img = vis_pose_result(pose_model, img, pose_results,
-                                      dataset=dataset,
-                                      kpt_score_thr=args.kpt_thr, show=False)
+        else:
+            skip_count += 1
+            print('skipping')
+            pose_results = prev_pose
 
-            if args.show and frame % args.skip_rate == 0:
-                print(f'args show: {args.show}')
-                print(f'rest: {frame % args.skip_rate == 0}')
-                cv2.imshow('Image', vis_img)
+        vis_img = vis_pose_result(pose_model, img, pose_results,
+                                    dataset=dataset,
+                                    kpt_score_thr=args.kpt_thr, show=False)
 
-            if args.save_vid:
-                if args.flip:  # flip to produce video as original
-                    vis_img = cv2.flip(vis_img, 1)
-                videoWriter.write(vis_img)
-            if frame == 10:
-                if args.flip:  # flip to produce video as original
-                    vis_img = cv2.flip(vis_img, 1)
-                img2save = cv2.resize(vis_img, (int(vis_img.shape[0]/5),
-                                                int(vis_img.shape[1])),
-                                      interpolation=cv2.INTER_AREA)
-                cv2.imwrite(f"{args.video_path.split('.')[0]}.jpg", img2save)
-                del img2save
+        if args.show and frame % args.skip_rate == 0:
+            print(f'args show: {args.show}')
+            print(f'rest: {frame % args.skip_rate == 0}')
+            cv2.imshow('Image', vis_img)
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+        if args.save_vid:
+            if args.flip:  # flip to produce video as original
+                vis_img = cv2.flip(vis_img, 1)
+            videoWriter.write(vis_img)
+        if frame == 10:
+            if args.flip:  # flip to produce video as original
+                vis_img = cv2.flip(vis_img, 1)
+            img2save = cv2.resize(vis_img, (int(vis_img.shape[0]/5),
+                                            int(vis_img.shape[1])),
+                                    interpolation=cv2.INTER_AREA)
+            cv2.imwrite(f"{args.video_path.split('.')[0]}.jpg", img2save)
+            del img2save
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
         frame += 1
 
