@@ -1,10 +1,11 @@
-FROM python:3.7.11-slim-bullseye
+# FROM python:3.7.11-slim-bullseye
+FROM python:3.8.13-slim-bullseye
 RUN apt-get update && apt-get install wget git gcc g++ libgl1 libglib2.0-0 libsm6 libxrender1 libxext6 libtinfo5 -y
 WORKDIR /app
 COPY requirements.txt /app/requirements.txt
-RUN python3.7 -m venv /home/myuser/venv
+RUN python3.8 -m venv /home/myuser/venv
 ENV PATH="/home/myuser/venv/bin:$PATH"
-RUN /home/myuser/venv/bin/python3.7 -m pip install --upgrade pip
+RUN /home/myuser/venv/bin/python3.8 -m pip install --upgrade pip
 RUN pip3 install --no-cache-dir wheel
 RUN pip3 install numpy==1.19.5
 RUN echo lol
