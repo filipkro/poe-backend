@@ -67,7 +67,13 @@ def resample(x, factor, kind='linear'):
     from scipy.interpolate import interp1d
 
     n = int(np.ceil(x.shape[0] / factor))
-    f = interp1d(np.linspace(0, 1, x.shape[0]), x, kind, axis=0)
+    try:
+        f = interp1d(np.linspace(0, 1, x.shape[0]), x, kind, axis=0)
+    except ValueError as e:
+        print(e)
+        print(f"x shape: {x.shape}")
+        print(f"x :{x}")
+        raise e
     return f(np.linspace(0, 1, n))
 
 
@@ -161,6 +167,9 @@ def main(args, data, fps):
             except ValueError as e:
                 print(e)
                 print(f"poe_data shape: {poe_data.shape}")
+                print(f"i: {i}")
+                print(f"max_idx: {max_idx}")
+                print(f"rate: {rate}")
                 raise e
         datasets100[poe] = new_data
 
