@@ -1,3 +1,4 @@
+from configparser import Interpolation
 import os
 import sys
 from argparse import ArgumentParser, ArgumentTypeError
@@ -15,6 +16,7 @@ BASE = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)),
 sys.path.append(os.path.join(BASE, 'mmpose'))
 sys.path.append(os.path.join(BASE, 'mmpose/mmdetection'))
 
+REDUCE_RATIO = 2
 
 def box_check(img, folder_box, show_box=False, device='cpu'):
     ''' Checks whether person is standing upright or not in video '''
@@ -136,11 +138,11 @@ def loop(args, rotate, bbox, rotate_180=False, t0=time.perf_counter(),
     frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     if rotate:
-        size = (int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-                int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)))
+        size = (int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) / REDUCE_RATIO),
+                int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) / REDUCE_RATIO))
     else:
-        size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) / REDUCE_RATIO),
+                int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) / REDUCE_RATIO))
 
     print(size)
     args.skip_rate = 2
@@ -163,6 +165,10 @@ def loop(args, rotate, bbox, rotate_180=False, t0=time.perf_counter(),
     while (cap.isOpened()):
         t1 = time.perf_counter()
         flag, img = cap.read()
+        if REDUCE_RATIO > 1:
+            img = cv2.resize(img, (int(np.round(img.shape[0] / REDUCE_RATIO)),
+                                   int(np.round(img.shape[0] / REDUCE_RATIO))),
+                             interpolation=cv2.INTER_LINEAR)
         # check every nd frame
         # if frame % args.skip_rate == 0:
         if skip_count > frame_to_skip:
@@ -253,6 +259,10 @@ def find_bbox(args, cap):
 
     print('Frame rate: {} fps'.format(fps))
     flag, img = cap.read()
+    if REDUCE_RATIO > 1:
+        img = cv2.resize(img, (int(np.round(img.shape[0] / REDUCE_RATIO)),
+                              int(np.round(img.shape[0] / REDUCE_RATIO))),
+                         interpolation=cv2.INTER_LINEAR)
 
     # person upright or not:
     # print(img)
@@ -261,11 +271,11 @@ def find_bbox(args, cap):
     if len(bbox) > 0:
 
         if rotate:
-            size = (int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-                    int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)))
+            size = (int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) / REDUCE_RATIO),
+                    int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)  / REDUCE_RATIO))
         else:
-            size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                    int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+            size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)  / REDUCE_RATIO),
+                    int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  / REDUCE_RATIO))
 
         cap.release()
         # upside down or not:
