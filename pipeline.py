@@ -77,7 +77,11 @@ def pipe(file_path, leg, debug):
         #     d = pickle.load(fi)
         # poses = d['poses']
         # fps = d['fps']
-        datasets, datasets100 = extract_reps(poses, fps)
+        try:
+            datasets, datasets100 = extract_reps(poses, fps)
+        except ValueError as e:
+            print(e)
+            print(f"pose shape: {poses.shape}")
         print('datasets found')
         # with open('/data/datasets.pkl', 'wb') as fo:
         #     pickle.dump({'data': datasets, 'data100': datasets100}, fo)

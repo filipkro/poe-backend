@@ -156,7 +156,12 @@ def main(args, data, fps):
         for i in range(poe_data.shape[0]):
             max_idx = np.where(poe_data[i, :, 0] < -900)[0][0]
             rate = max_idx / 100
-            new_data[i, ...] = resample(poe_data[i, :max_idx, :], rate)[:100, ...]
+            try:
+                new_data[i, ...] = resample(poe_data[i, :max_idx, :], rate)[:100, ...]
+            except ValueError as e:
+                print(e)
+                print(f"poe_data shape: {poe_data.shape}")
+                raise e
         datasets100[poe] = new_data
 
     print(datasets['trunk'].shape)
